@@ -8,8 +8,7 @@
         placeholder="搜索标题或描述"
       />
 
-      <div class="-mx-1 overflow-x-auto px-1 pb-1">
-        <div class="grid min-w-[34rem] grid-cols-2 gap-2.5 sm:min-w-0 sm:grid-cols-4">
+      <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           <select
             v-model="statusProxy"
             class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition duration-200 hover:border-blue-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
@@ -44,7 +43,6 @@
           </select>
         </div>
       </div>
-    </div>
 
     <div class="mt-4 flex items-center justify-between gap-3 border-t border-slate-200 pt-3">
       <span class="text-xs font-medium text-slate-400">筛选条件可组合使用</span>

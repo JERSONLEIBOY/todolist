@@ -57,7 +57,7 @@
 
           <div class="space-y-2">
             <label class="block text-sm font-medium text-slate-700">新增分类</label>
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div class="flex flex-col gap-2">
               <input
                 v-model.trim="newCategory"
                 type="text"
@@ -67,7 +67,7 @@
               />
               <button
                 type="button"
-                class="whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-700 transition duration-200 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-slate-200 disabled:hover:bg-white disabled:hover:text-slate-700"
+                class="self-start whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-700 transition duration-200 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-slate-200 disabled:hover:bg-white disabled:hover:text-slate-700"
                 :disabled="!newCategory.trim()"
                 @click="handleAddCategory"
               >
