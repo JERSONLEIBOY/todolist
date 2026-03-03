@@ -1,42 +1,50 @@
 <template>
-  <div class="min-h-screen bg-slate-50 text-slate-900">
+  <div class="min-h-screen text-slate-900">
     <Toast :bus="toastBus" />
-    <header class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-10 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h1 class="text-3xl font-semibold text-primary">TodoList</h1>
-        <p class="mt-2 text-sm text-slate-600">基于 PRD/TECH_DESIGN 的实现骨架</p>
+    <header class="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 pb-6 pt-8 sm:px-6 lg:px-8 lg:pb-8">
+      <div class="surface-card flex flex-col gap-4 p-5 sm:p-6 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-blue-600 sm:text-3xl">TodoList</h1>
+          <p class="mt-2 text-sm font-normal text-slate-600">高效管理每日任务，保持专注与节奏</p>
+        </div>
+        <HeaderStats :stats="stats" />
       </div>
-      <HeaderStats :stats="stats" />
     </header>
 
-    <main class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 pb-16 lg:grid-cols-3">
-      <section class="space-y-4 lg:col-span-1">
+    <main class="mx-auto grid w-full max-w-5xl grid-cols-1 gap-5 px-4 pb-12 sm:px-6 lg:grid-cols-3 lg:gap-6 lg:px-8 lg:pb-16">
+      <section class="space-y-5 lg:col-span-1">
         <TodoForm
           :categories="categories"
           :default-category="categories[0] ?? '工作'"
-          @submit="handleCreate"
+          :on-add-category="addCategory"
+          :editing-todo="editingTodo"
+          :is-editing="Boolean(editingTodo)"
+          @submit="handleSubmit"
+          @cancel-edit="cancelEdit"
         />
-            <FiltersBar
-              :categories="categories"
-              :keyword="keyword"
-              :status="status"
-              :priority="priority"
-              :category="category"
-              :sort-by="sortBy"
-              @update:keyword="(v) => (keyword.value = v.trim().toLowerCase())"
-              @update:status="(v) => (status.value = v)"
-              @update:priority="(v) => (priority.value = v)"
-              @update:category="(v) => (category.value = v)"
-              @update:sortBy="(v) => (sortBy.value = v)"
-              @reset="handleReset"
-            />
+        <FiltersBar
+          :categories="categories"
+          :keyword="keyword"
+          :status="status"
+          :priority="priority"
+          :category="category"
+          :sort-by="sortBy"
+          @update:keyword="(v) => (keyword = v.trim().toLowerCase())"
+          @update:status="(v) => (status = v)"
+          @update:priority="(v) => (priority = v)"
+          @update:category="(v) => (category = v)"
+          @update:sortBy="(v) => (sortBy = v)"
+          @reset="reset"
+        />
       </section>
 
-      <section class="space-y-4 lg:col-span-2">
-        <div class="rounded-2xl bg-white p-6 shadow-card">
-          <div class="flex items-center justify-between">
+      <section class="lg:col-span-2">
+        <div class="surface-card p-5 sm:p-6">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
             <h2 class="text-lg font-semibold text-slate-800">任务列表</h2>
-            <span class="text-sm text-slate-500">{{ filteredTodos.length }} 条</span>
+            <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 sm:text-sm">
+              {{ filteredTodos.length }} 条
+            </span>
           </div>
           <div class="mt-4">
             <TodoList
@@ -71,7 +79,7 @@ const toastBus = new EventTarget()
 const toast = (message: string, duration?: number) =>
   toastBus.dispatchEvent(new CustomEvent('toast', { detail: { message, duration } }))
 
-const { categories, options: categoryOptions } = useCategories()
+const { categories, addCategory } = useCategories()
 const { todos, create, toggle, update, remove, stats } = useTodos()
 const { keyword, status, priority, category, sortBy, reset } = useFilters()
 
@@ -106,14 +114,22 @@ const filteredTodos = computed(() => {
 })
 
 const confirmingId = ref<string | null>(null)
+const editingTodo = ref<Todo | null>(null)
 
-function handleCreate(payload: {
+function handleSubmit(payload: {
   title: string
   description: string
   priority: Todo['priority']
   category: string
   dueDate: string | null
 }) {
+  if (editingTodo.value) {
+    update(editingTodo.value.id, payload)
+    toast('已保存修改')
+    editingTodo.value = null
+    return
+  }
+
   create(payload)
   toast('创建成功')
 }
@@ -124,8 +140,11 @@ function handleToggle(id: string, completed: boolean) {
 }
 
 function handleEdit(todo: Todo) {
-  update(todo.id, todo)
-  toast('已保存修改')
+  editingTodo.value = { ...todo }
+}
+
+function cancelEdit() {
+  editingTodo.value = null
 }
 
 function confirmDelete(id: string) {
